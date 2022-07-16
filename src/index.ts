@@ -43,6 +43,9 @@ function init(): WorldState {
   return world;
 }
 
+const canvasWidth: number = canvas.width;
+const canvasHeight: number = canvas.height;
+
 let world: WorldState = init();
 
 function animate() {
@@ -54,11 +57,11 @@ function animate() {
 
   // draw player and game objects, update their positions afterwards
   world.player.draw(ctx);
-  world.player.updatePosition();
+  world.player.updatePosition(canvasWidth, canvasHeight);
   [world.playerMissiles, world.enemies, world.enemyMissiles].forEach((l) => {
     l.forEach((x) => {
       x.draw(ctx);
-      x.updatePosition();
+      x.updatePosition(canvasWidth, canvasHeight);
     });
   });
 

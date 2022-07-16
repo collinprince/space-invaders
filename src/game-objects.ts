@@ -54,7 +54,7 @@ export abstract class GameObject {
     this.setDy(dy);
   }
 
-  updatePosition(): void {
+  updatePosition(canvasWidth: number, canvasHeight: number): void {
     this.x += this.dx;
     this.y += this.dy;
   }
@@ -72,6 +72,13 @@ export class EnemyShip extends GameObject {
 }
 
 export class PlayerShip extends GameObject {
+  updatePosition(canvasWidth: number, canvasHeight: number): void {
+    this.x += this.dx;
+
+    if (this.x < 0) this.x = 0;
+    if (this.x + this.width >= canvasWidth) this.x = canvasWidth - this.width;
+  }
+
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = "blue";
     ctx.beginPath();
