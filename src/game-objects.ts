@@ -93,5 +93,7 @@ export class EnemyMissile extends GameObject {
 
 export type WorldState = {
   player: PlayerShip;
-  gameObjects: Array<GameObject>;
+  playerMissiles: Array<PlayerMissile>;
+  enemies: Array<EnemyShip>;
+  enemyMissiles: Array<EnemyMissile>;
 };

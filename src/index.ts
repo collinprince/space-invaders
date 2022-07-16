@@ -24,10 +24,12 @@ function init(): WorldState {
       0,
       0
     ),
-    gameObjects: new Array(),
+    playerMissiles: new Array(),
+    enemies: new Array(),
+    enemyMissiles: new Array(),
   };
   for (let i = 0; i < 10; ++i) {
-    world.gameObjects.push(
+    world.enemies.push(
       new EnemyShip(
         20 + (canvas.width / 10) * i,
         canvas.height / 10,
@@ -50,14 +52,21 @@ function animate() {
   // draw player and game objects, update their positions afterwards
   world.player.draw(ctx);
   world.player.updatePosition();
-  world.gameObjects.forEach((x) => {
-    x.draw(ctx);
-    x.updatePosition();
+  [world.playerMissiles, world.enemies, world.enemyMissiles].forEach((l) => {
+    l.forEach((x) => {
+      x.draw(ctx);
+      x.updatePosition();
+    });
   });
 
   // clear out dead game objects
-  world.gameObjects = world.gameObjects.filter((x: GameObject) => x.isAlive());
-
+  [world.playerMissiles, world.enemies, world.enemyMissiles] = [
+    world.playerMissiles,
+    world.enemies,
+    world.enemyMissiles,
+  ].map((l: Array<GameObject>) => {
+    return l.filter((x: GameObject) => x.isAlive());
+  });
   requestAnimationFrame(animate);
 }
 

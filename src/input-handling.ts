@@ -41,7 +41,7 @@ const onArrowRight = (world: WorldState) => {
   world.player.setDx(1);
 };
 const onSpacebar = (world: WorldState) => {
-  world.gameObjects.push(
+  world.playerMissiles.push(
     new PlayerMissile(world.player.x, world.player.y, 5, 5, 0, -2)
   );
 };
