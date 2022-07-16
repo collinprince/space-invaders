@@ -1,5 +1,3 @@
-import { drawTriangle } from "./utils/shapes";
-import { Point } from "./types";
 import { GameObject, PlayerShip, EnemyShip, WorldState } from "./game-objects";
 import {
   parseInputAndReturnAction,
@@ -7,6 +5,7 @@ import {
   WorldModifierFunc,
 } from "./input-handling";
 import { objectsAreColliding } from "./utils/boundaries";
+import { writeText } from "./utils/canvas-helpers";
 
 const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
@@ -34,8 +33,8 @@ function init(): WorldState {
       new EnemyShip(
         20 + (canvas.width / 10) * i,
         canvas.height / 10,
-        10,
-        10,
+        20,
+        20,
         0,
         0
       )
@@ -49,6 +48,9 @@ let world: WorldState = init();
 function animate() {
   // clear canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // inform user of how many enemies they have left to kill
+  writeText(ctx, `Enemies remaining: ${world.enemies.length}`);
 
   // draw player and game objects, update their positions afterwards
   world.player.draw(ctx);
@@ -80,6 +82,7 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
+// listen for user inputs with keydown and keyup
 document.addEventListener("keydown", (e: KeyboardEvent) => {
   let action: WorldModifierFunc = parseInputAndReturnAction(e);
   action(world);

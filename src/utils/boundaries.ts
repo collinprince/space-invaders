@@ -10,6 +10,9 @@ const intervalWithLesserOrEqualStart = (l: Interval, r: Interval): Interval =>
 const intervalWithGreaterOrEqualStart = (l: Interval, r: Interval): Interval =>
   l.start < r.start ? r : l;
 
+// this function assumes two rectangles are colliding, may have to provide
+// specific collision formulas for different shapes if exact collision
+// detection is desired
 export const objectsAreColliding = (l: GameObject, r: GameObject): boolean => {
   const l_xInterval: Interval = { start: l.x, end: l.x + l.width };
   const l_yInterval: Interval = { start: l.y, end: l.y + l.height };
