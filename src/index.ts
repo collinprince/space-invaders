@@ -6,6 +6,7 @@ import {
   parseInputAndStopPlayerMoving,
   WorldModifierFunc,
 } from "./input-handling";
+import { objectsAreColliding } from "./utils/boundaries";
 
 const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
@@ -59,6 +60,15 @@ function animate() {
     });
   });
 
+  // detect collisions between player missiles and enemy ships
+  world.enemies.forEach((enemy) => {
+    world.playerMissiles.forEach((playerMissile) => {
+      if (objectsAreColliding(enemy, playerMissile)) {
+        enemy.alive = false;
+        playerMissile.alive = false;
+      }
+    });
+  });
   // clear out dead game objects
   [world.playerMissiles, world.enemies, world.enemyMissiles] = [
     world.playerMissiles,

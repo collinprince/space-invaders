@@ -83,7 +83,7 @@ export class PlayerMissile extends GameObject {
 
   // we will deem a missile dead after it has left the canvas
   isAlive(): boolean {
-    return this.y > 0;
+    return this.alive && this.y > 0;
   }
 }
 

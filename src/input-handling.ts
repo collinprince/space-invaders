@@ -1,5 +1,8 @@
 import { WorldState, PlayerMissile } from "./game-objects";
 
+const PLAYER_SPEED = 5;
+const MISSILE_SPEED = 5;
+
 const isLeftKey = (key: string): boolean =>
   key === "ArrowLeft" || key === "Left";
 const isRightKey = (key: string): boolean =>
@@ -35,13 +38,13 @@ export const parseInputAndStopPlayerMoving = (
 };
 
 const onArrowLeft = (world: WorldState) => {
-  world.player.setDx(-1);
+  world.player.setDx(-PLAYER_SPEED);
 };
 const onArrowRight = (world: WorldState) => {
-  world.player.setDx(1);
+  world.player.setDx(PLAYER_SPEED);
 };
 const onSpacebar = (world: WorldState) => {
   world.playerMissiles.push(
-    new PlayerMissile(world.player.x, world.player.y, 5, 5, 0, -2)
+    new PlayerMissile(world.player.x, world.player.y, 5, 5, 0, -MISSILE_SPEED)
   );
 };
