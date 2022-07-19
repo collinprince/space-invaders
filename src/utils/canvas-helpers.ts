@@ -1,12 +1,13 @@
+import { Point } from "../types";
+
 export const writeText = (
   ctx: CanvasRenderingContext2D,
   text: string,
-  x: number = 10,
-  y: number = 20,
+  point: Point,
   font: string = "20px Arial",
   fillStyle: string = "black"
 ): void => {
   ctx.fillStyle = fillStyle;
   ctx.font = font;
-  ctx.fillText(text, x, y);
+  ctx.fillText(text, point.x, point.y);
 };

@@ -9,7 +9,9 @@ import {
   init,
   drawAndUpdateWorld,
   detectPlayerMissileAndEnemyShipCollisions,
+  detectEnemyMissileAndPlayerShipCollisions,
   clearDeadGameObjectsFromWorld,
+  randomlyGenerateEnemyMissiles,
 } from "./world";
 
 const canvas: HTMLCanvasElement = document.getElementById(
@@ -31,13 +33,22 @@ function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // inform user of how many enemies they have left to kill
-  writeText(ctx, `Enemies remaining: ${world.enemies.length}`);
+  writeText(ctx, `Enemies remaining: ${world.enemies.length}`, {
+    x: 10,
+    y: 20,
+  });
+  writeText(ctx, `Lives remaining: ${world.player.numLives}`, { x: 10, y: 50 });
+
+  // randomly generate attacks against the player
+  randomlyGenerateEnemyMissiles(world);
 
   // draw player and game objects, update their positions afterwards
   drawAndUpdateWorld(ctx, canvasWidth, canvasHeight, world);
 
   // detect collisions between player missiles and enemy ships
   detectPlayerMissileAndEnemyShipCollisions(world);
+  // detect collisions between enemy missiles and player ship
+  detectEnemyMissileAndPlayerShipCollisions(world);
   // clear out dead game objects
   clearDeadGameObjectsFromWorld(world);
   // call next animation frame

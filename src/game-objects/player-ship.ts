@@ -4,17 +4,31 @@ import { Point } from "../types";
 export const PLAYER_SHIP_WIDTH: number = 20;
 export const PLAYER_SHIP_HEIGHT: number = 30;
 
-export const createPlayerShip = (startPoint: Point): GameObject => {
-  return new GameObject(
-    startPoint.x,
-    startPoint.y,
-    PLAYER_SHIP_WIDTH,
-    PLAYER_SHIP_HEIGHT,
-    0,
-    0,
-    playerShipDraw,
-    { updatePosition: playerShipUpdatePosition }
-  );
+const STARTING_NUM_LIVES: number = 3;
+
+export class PlayerShip extends GameObject {
+  numLives: number;
+  constructor(startPoint: Point) {
+    super(
+      startPoint.x,
+      startPoint.y,
+      PLAYER_SHIP_WIDTH,
+      PLAYER_SHIP_HEIGHT,
+      0,
+      0,
+      playerShipDraw,
+      { updatePosition: playerShipUpdatePosition, isAlive: isAlivePlayer }
+    );
+    this.numLives = STARTING_NUM_LIVES;
+  }
+
+  decrementLives(): void {
+    this.numLives -= 1;
+  }
+}
+
+export const createPlayerShip = (startPoint: Point): PlayerShip => {
+  return new PlayerShip(startPoint);
 };
 
 function playerShipDraw(this: GameObject, ctx: CanvasRenderingContext2D): void {
@@ -40,7 +54,7 @@ function playerShipDraw(this: GameObject, ctx: CanvasRenderingContext2D): void {
 }
 
 function playerShipUpdatePosition(
-  this: GameObject,
+  this: PlayerShip,
   canvasWidth: number,
   _: number
 ): void {
@@ -48,4 +62,8 @@ function playerShipUpdatePosition(
 
   if (this.x < 0) this.x = 0;
   if (this.x + this.width >= canvasWidth) this.x = canvasWidth - this.width;
+}
+
+function isAlivePlayer(this: PlayerShip): boolean {
+  return this.numLives > 0;
 }

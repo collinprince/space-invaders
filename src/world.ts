@@ -1,14 +1,18 @@
 import { GameObject } from "./game-objects/game-object";
+import { PlayerShip } from "./game-objects/player-ship";
 import { objectsAreColliding } from "./utils/boundaries";
 import { Point } from "./types";
 import { createPlayerShip } from "./game-objects/player-ship";
 import { createEnemyShip } from "./game-objects/enemy-ship";
+import { createEnemyMissile } from "./game-objects/enemy-missile";
 
 export type WorldState = {
-  player: GameObject;
+  player: PlayerShip;
   playerMissiles: Array<GameObject>;
   enemies: Array<GameObject>;
   enemyMissiles: Array<GameObject>;
+  maxX: number;
+  maxY: number;
 };
 
 // function to create a world object in a startup state
@@ -23,6 +27,8 @@ export const init = (
     playerMissiles: new Array(),
     enemies: new Array(),
     enemyMissiles: new Array(),
+    maxX: canvasWidth,
+    maxY: canvasHeight,
   };
   for (let i = 0; i < numEnemies; ++i) {
     let point: Point = {
@@ -50,6 +56,20 @@ export const drawAndUpdateWorld = (
   });
 };
 
+const CHANCE_MISSILES: number = 0.001;
+
+export const randomlyGenerateEnemyMissiles = (world: WorldState): void => {
+  world.enemies.forEach((enemy) => {
+    if (Math.random() < CHANCE_MISSILES) {
+      let startPoint: Point = {
+        x: enemy.x + enemy.width / 2,
+        y: enemy.y + enemy.height,
+      };
+      world.enemyMissiles.push(createEnemyMissile(startPoint, world.maxY));
+    }
+  });
+};
+
 export const detectPlayerMissileAndEnemyShipCollisions = (
   world: WorldState
 ): void => {
@@ -60,6 +80,17 @@ export const detectPlayerMissileAndEnemyShipCollisions = (
         playerMissile.alive = false;
       }
     });
+  });
+};
+
+export const detectEnemyMissileAndPlayerShipCollisions = (
+  world: WorldState
+): void => {
+  world.enemyMissiles.forEach((enemyMissile) => {
+    if (objectsAreColliding(world.player, enemyMissile)) {
+      world.player.decrementLives();
+      enemyMissile.alive = false;
+    }
   });
 };
 
