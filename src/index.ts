@@ -1,11 +1,16 @@
-import { GameObject, PlayerShip, EnemyShip, WorldState } from "./game-objects";
 import {
   parseInputAndReturnAction,
   parseInputAndStopPlayerMoving,
   WorldModifierFunc,
 } from "./input-handling";
-import { objectsAreColliding } from "./utils/boundaries";
 import { writeText } from "./utils/canvas-helpers";
+import {
+  WorldState,
+  init,
+  drawAndUpdateWorld,
+  detectPlayerMissileAndEnemyShipCollisions,
+  clearDeadGameObjectsFromWorld,
+} from "./world";
 
 const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
@@ -14,39 +19,12 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
   "2d"
 ) as CanvasRenderingContext2D;
 
-function init(): WorldState {
-  let world: WorldState = {
-    player: new PlayerShip(
-      canvas.width / 2 - 10,
-      canvas.height - 100,
-      20,
-      30,
-      0,
-      0
-    ),
-    playerMissiles: new Array(),
-    enemies: new Array(),
-    enemyMissiles: new Array(),
-  };
-  for (let i = 0; i < 10; ++i) {
-    world.enemies.push(
-      new EnemyShip(
-        20 + (canvas.width / 10) * i,
-        canvas.height / 10,
-        20,
-        20,
-        0,
-        0
-      )
-    );
-  }
-  return world;
-}
-
+const NUM_ENEMIES: number = 10;
 const canvasWidth: number = canvas.width;
 const canvasHeight: number = canvas.height;
 
-let world: WorldState = init();
+// initialize world
+let world: WorldState = init(canvasWidth, canvasHeight, NUM_ENEMIES);
 
 function animate() {
   // clear canvas
@@ -56,32 +34,13 @@ function animate() {
   writeText(ctx, `Enemies remaining: ${world.enemies.length}`);
 
   // draw player and game objects, update their positions afterwards
-  world.player.draw(ctx);
-  world.player.updatePosition(canvasWidth, canvasHeight);
-  [world.playerMissiles, world.enemies, world.enemyMissiles].forEach((l) => {
-    l.forEach((x) => {
-      x.draw(ctx);
-      x.updatePosition(canvasWidth, canvasHeight);
-    });
-  });
+  drawAndUpdateWorld(ctx, canvasWidth, canvasHeight, world);
 
   // detect collisions between player missiles and enemy ships
-  world.enemies.forEach((enemy) => {
-    world.playerMissiles.forEach((playerMissile) => {
-      if (objectsAreColliding(enemy, playerMissile)) {
-        enemy.alive = false;
-        playerMissile.alive = false;
-      }
-    });
-  });
+  detectPlayerMissileAndEnemyShipCollisions(world);
   // clear out dead game objects
-  [world.playerMissiles, world.enemies, world.enemyMissiles] = [
-    world.playerMissiles,
-    world.enemies,
-    world.enemyMissiles,
-  ].map((l: Array<GameObject>) => {
-    return l.filter((x: GameObject) => x.isAlive());
-  });
+  clearDeadGameObjectsFromWorld(world);
+  // call next animation frame
   requestAnimationFrame(animate);
 }
 

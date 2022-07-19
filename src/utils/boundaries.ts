@@ -1,4 +1,4 @@
-import { GameObject } from "../game-objects";
+import { GameObject } from "../game-objects/game-object";
 
 type Interval = {
   start: number;

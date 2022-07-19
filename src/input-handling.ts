@@ -1,11 +1,8 @@
-import { WorldState, PlayerMissile } from "./game-objects";
+import { WorldState } from "./world";
+import { createPlayerMissile } from "./game-objects/player-missile";
+import { Point } from "./types";
 
-const PLAYER_SPEED = 5;
-const PLAYER_MISSILE_SPEED = 10;
-
-const PLAYER_MISSILE_WIDTH = 5;
-const PLAYER_MISSILE_HEIGHT = 10;
-
+const PLAYER_MOVING_SPEED = 5;
 const isLeftKey = (key: string): boolean =>
   key === "ArrowLeft" || key === "Left";
 const isRightKey = (key: string): boolean =>
@@ -41,27 +38,19 @@ export const parseInputAndStopPlayerMoving = (
 };
 
 const onArrowLeft = (world: WorldState) => {
-  world.player.setDx(-PLAYER_SPEED);
+  world.player.setDx(-PLAYER_MOVING_SPEED);
 };
 const onArrowRight = (world: WorldState) => {
-  world.player.setDx(PLAYER_SPEED);
+  world.player.setDx(PLAYER_MOVING_SPEED);
 };
 const onSpacebar = (world: WorldState) => {
+  let playerShipStartPoint: Point = {
+    x: world.player.x,
+    y: world.player.y,
+  };
   world.playerMissiles.push(
-    // choosing player missile starting point is a bit awkward
-    // since it's being drawn as a triangle, but game objects are
-    // represented internally/collision detected as a rectangle
-
-    // player missile's "top left" origin point is
-    // at the same y value as its triangle point and
-    // the same x as its bottom left point
-    new PlayerMissile(
-      world.player.x + world.player.width / 2 - PLAYER_MISSILE_WIDTH / 2,
-      world.player.y - PLAYER_MISSILE_HEIGHT,
-      PLAYER_MISSILE_WIDTH,
-      PLAYER_MISSILE_HEIGHT,
-      0,
-      -PLAYER_MISSILE_SPEED
-    )
+    // player's origin is given to player missile's factory function
+    // which handles setting up its correct start point
+    createPlayerMissile(playerShipStartPoint)
   );
 };
