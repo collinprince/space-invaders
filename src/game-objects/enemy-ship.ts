@@ -27,8 +27,17 @@ export const createEnemyShip = (startPoint: Point): EnemyShip => {
 };
 
 function drawEnemyShip(this: GameObject, ctx: CanvasRenderingContext2D): void {
+  ctx.strokeStyle = "white";
   ctx.fillStyle = "red";
-  ctx.fillRect(this.x, this.y, this.width, this.height);
+  ctx.beginPath();
+  ctx.moveTo(this.x, this.y);
+  ctx.lineTo(this.x + this.width / 2, this.y + this.height);
+  ctx.lineTo(this.x + this.width, this.y);
+  ctx.lineTo(this.x + this.width / 2, this.y + this.height / 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // ctx.fillRect(this.x, this.y, this.width, this.height);
 }
 
 function updatePositionEnemyShip(this: EnemyShip): void {

@@ -34,6 +34,8 @@ function animate() {
   const { canvasWidth, canvasHeight } = canvasDimensions;
   // clear canvas
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
   gameStateMachineUpdate(
     world,

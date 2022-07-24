@@ -5,7 +5,7 @@ export const writeText = (
   text: string,
   point: Point,
   font: string = "20px Arial",
-  fillStyle: string = "black"
+  fillStyle: string = "white"
 ): void => {
   ctx.fillStyle = fillStyle;
   ctx.font = font;
