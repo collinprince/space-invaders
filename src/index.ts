@@ -1,9 +1,4 @@
-import {
-  parseInputAndReturnAction,
-  parseInputAndStopPlayerMoving,
-  WorldModifierFunc,
-} from "./input-handling";
-import { writeText } from "./utils/canvas-helpers";
+import { Key, parseKey } from "./input-handling";
 import {
   WorldState,
   init,
@@ -12,7 +7,12 @@ import {
   detectEnemyMissileAndPlayerShipCollisions,
   clearDeadGameObjectsFromWorld,
   randomlyGenerateEnemyMissiles,
+  gameStateMachineUpdate,
 } from "./world";
+
+import { displayText } from "./utils/display-text";
+
+import { CanvasDimensions } from "./types";
 
 const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
@@ -22,22 +22,27 @@ const ctx: CanvasRenderingContext2D = canvas.getContext(
 ) as CanvasRenderingContext2D;
 
 const NUM_ENEMIES: number = 10;
-const canvasWidth: number = canvas.width;
-const canvasHeight: number = canvas.height;
+let canvasDimensions: CanvasDimensions = {
+  canvasWidth: canvas.width,
+  canvasHeight: canvas.height,
+};
 
 // initialize world
-let world: WorldState = init(canvasWidth, canvasHeight, NUM_ENEMIES);
+let world: WorldState = init(canvasDimensions, NUM_ENEMIES);
 
 function animate() {
+  const { canvasWidth, canvasHeight } = canvasDimensions;
   // clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  // inform user of how many enemies they have left to kill
-  writeText(ctx, `Enemies remaining: ${world.enemies.length}`, {
-    x: 10,
-    y: 20,
-  });
-  writeText(ctx, `Lives remaining: ${world.player.numLives}`, { x: 10, y: 50 });
+  gameStateMachineUpdate(
+    world,
+    { keyDown: Key.NoOp, keyUp: Key.NoOp },
+    canvasDimensions
+  );
+
+  // write information for user to screen (lives remaining, title text, etc.)
+  displayText(ctx, world, canvasDimensions);
 
   // randomly generate attacks against the player
   randomlyGenerateEnemyMissiles(world);
@@ -57,12 +62,22 @@ function animate() {
 
 // listen for user inputs with keydown and keyup
 document.addEventListener("keydown", (e: KeyboardEvent) => {
-  let action: WorldModifierFunc = parseInputAndReturnAction(e);
-  action(world);
+  gameStateMachineUpdate(
+    world,
+    { keyDown: parseKey(e), keyUp: Key.NoOp },
+    canvasDimensions
+  );
+  // parseInputAndReturnAction(e, world);
+  // action(world);
 });
 
 document.addEventListener("keyup", (e: KeyboardEvent) => {
-  parseInputAndStopPlayerMoving(e, world);
+  gameStateMachineUpdate(
+    world,
+    { keyDown: Key.NoOp, keyUp: parseKey(e) },
+    canvasDimensions
+  );
+  // parseInputAndStopPlayerMoving(e, world);
 });
 
 animate();

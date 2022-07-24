@@ -3,8 +3,8 @@ import { Point } from "../types";
 
 export const PLAYER_SHIP_WIDTH: number = 20;
 export const PLAYER_SHIP_HEIGHT: number = 30;
-
-const STARTING_NUM_LIVES: number = 3;
+export const PLAYER_MOVING_SPEED: number = 5;
+export const STARTING_NUM_LIVES: number = 3;
 
 export class PlayerShip extends GameObject {
   numLives: number;
