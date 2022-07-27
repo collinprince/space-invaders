@@ -7,6 +7,7 @@ import {
   detectEnemyMissileAndPlayerShipCollisions,
   clearDeadGameObjectsFromWorld,
   randomlyGenerateEnemyMissiles,
+  randomlyGenerateStars,
 } from "./world";
 import { stateMachine } from "./state-machine/game-state-machine";
 import { displayText } from "./utils/display-text";
@@ -46,6 +47,8 @@ function animate() {
 
   // randomly generate attacks against the player
   randomlyGenerateEnemyMissiles(world);
+  // randomly generate stars in the background
+  randomlyGenerateStars(world);
 
   // draw player and game objects, update their positions afterwards
   drawAndUpdateWorld(ctx, canvasWidth, canvasHeight, world);

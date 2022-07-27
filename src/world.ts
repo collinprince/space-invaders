@@ -6,6 +6,10 @@ import { createPlayerShip } from "./game-objects/player-ship";
 import { createEnemyShip } from "./game-objects/enemy-ship";
 import { createEnemyMissile } from "./game-objects/enemy-missile";
 import { createExplosion } from "./game-objects/explosion";
+import { createStar } from "./game-objects/star";
+import { getCanvasDimensions } from "./utils/canvas-helpers";
+
+const CHANCE_STAR = 0.002;
 
 export type WorldState = {
   player: PlayerShip;
@@ -13,6 +17,7 @@ export type WorldState = {
   enemies: Array<GameObject>;
   enemyMissiles: Array<GameObject>;
   explosions: Array<GameObject>;
+  stars: Array<GameObject>;
   maxX: number;
   maxY: number;
   gameMode: GameMode;
@@ -29,6 +34,7 @@ export const init = (
     playerMissiles: new Array(),
     enemies: new Array(),
     enemyMissiles: new Array(),
+    stars: new Array(),
     explosions: new Array(),
     maxX: canvasWidth,
     maxY: canvasHeight,
@@ -64,7 +70,14 @@ export const drawAndUpdateWorld = (
   canvasHeight: number,
   world: WorldState
 ): void => {
+  // draw stars no matter what mode we are in
+  // draw/update stars first to avoid drawing stars on top of other objects
+  world.stars.forEach((star) => {
+    star.draw(ctx);
+    star.updatePosition(canvasWidth, canvasHeight);
+  });
   if (world.gameMode === GameMode.Play) {
+    // draw player
     world.player.draw(ctx);
     world.player.updatePosition(canvasWidth, canvasHeight);
 
@@ -94,6 +107,15 @@ export const randomlyGenerateEnemyMissiles = (world: WorldState): void => {
       world.enemyMissiles.push(createEnemyMissile(startPoint, world.maxY));
     }
   });
+};
+
+export const randomlyGenerateStars = (world: WorldState): void => {
+  const { canvasWidth, canvasHeight } = getCanvasDimensions();
+  for (let x = 0; x < canvasWidth; ++x) {
+    if (Math.random() < CHANCE_STAR) {
+      world.stars.push(createStar({ x, y: canvasHeight }));
+    }
+  }
 };
 
 export const detectPlayerMissileAndEnemyShipCollisions = (
@@ -133,13 +155,19 @@ export const detectEnemyMissileAndPlayerShipCollisions = (
 };
 
 export const clearDeadGameObjectsFromWorld = (world: WorldState): void => {
-  [world.playerMissiles, world.enemies, world.enemyMissiles, world.explosions] =
-    [
-      world.playerMissiles,
-      world.enemies,
-      world.enemyMissiles,
-      world.explosions,
-    ].map((l: Array<GameObject>) => {
-      return l.filter((x: GameObject) => x.isAlive());
-    });
+  [
+    world.playerMissiles,
+    world.enemies,
+    world.enemyMissiles,
+    world.explosions,
+    world.stars,
+  ] = [
+    world.playerMissiles,
+    world.enemies,
+    world.enemyMissiles,
+    world.explosions,
+    world.stars,
+  ].map((l: Array<GameObject>) => {
+    return l.filter((x: GameObject) => x.isAlive());
+  });
 };
