@@ -44,6 +44,7 @@ function drawPlayerMissile(this: GameObject, ctx: CanvasRenderingContext2D) {
   let leftPoint: Point = { x: this.x, y: this.y + this.height };
 
   ctx.fillStyle = "blue";
+  ctx.strokeStyle = "white";
   drawTriangleFill(ctx, topPoint, rightPoint, leftPoint);
 }
 

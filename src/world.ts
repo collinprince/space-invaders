@@ -1,22 +1,18 @@
 import { GameObject } from "./game-objects/game-object";
-import {
-  PlayerShip,
-  PLAYER_MOVING_SPEED,
-  STARTING_NUM_LIVES,
-} from "./game-objects/player-ship";
+import { PlayerShip, STARTING_NUM_LIVES } from "./game-objects/player-ship";
 import { objectsAreColliding } from "./utils/boundaries";
 import { Point, CanvasDimensions, GameMode } from "./types";
 import { createPlayerShip } from "./game-objects/player-ship";
 import { createEnemyShip } from "./game-objects/enemy-ship";
 import { createEnemyMissile } from "./game-objects/enemy-missile";
-import { createPlayerMissile } from "./game-objects/player-missile";
-import { Key, UserInput } from "./input-handling";
+import { createExplosion } from "./game-objects/explosion";
 
 export type WorldState = {
   player: PlayerShip;
   playerMissiles: Array<GameObject>;
   enemies: Array<GameObject>;
   enemyMissiles: Array<GameObject>;
+  explosions: Array<GameObject>;
   maxX: number;
   maxY: number;
   gameMode: GameMode;
@@ -33,6 +29,7 @@ export const init = (
     playerMissiles: new Array(),
     enemies: new Array(),
     enemyMissiles: new Array(),
+    explosions: new Array(),
     maxX: canvasWidth,
     maxY: canvasHeight,
     gameMode: GameMode.Start,
@@ -71,7 +68,12 @@ export const drawAndUpdateWorld = (
     world.player.draw(ctx);
     world.player.updatePosition(canvasWidth, canvasHeight);
 
-    [world.playerMissiles, world.enemies, world.enemyMissiles].forEach((l) => {
+    [
+      world.playerMissiles,
+      world.enemies,
+      world.enemyMissiles,
+      world.explosions,
+    ].forEach((l) => {
       l.forEach((x) => {
         x.draw(ctx);
         x.updatePosition(canvasWidth, canvasHeight);
@@ -102,6 +104,12 @@ export const detectPlayerMissileAndEnemyShipCollisions = (
       if (objectsAreColliding(enemy, playerMissile)) {
         enemy.alive = false;
         playerMissile.alive = false;
+        world.explosions.push(
+          createExplosion({
+            x: playerMissile.x + playerMissile.width / 2,
+            y: playerMissile.y,
+          })
+        );
       }
     });
   });
@@ -114,16 +122,24 @@ export const detectEnemyMissileAndPlayerShipCollisions = (
     if (objectsAreColliding(world.player, enemyMissile)) {
       world.player.decrementLives();
       enemyMissile.alive = false;
+      world.explosions.push(
+        createExplosion({
+          x: enemyMissile.x + enemyMissile.width / 2,
+          y: enemyMissile.y,
+        })
+      );
     }
   });
 };
 
 export const clearDeadGameObjectsFromWorld = (world: WorldState): void => {
-  [world.playerMissiles, world.enemies, world.enemyMissiles] = [
-    world.playerMissiles,
-    world.enemies,
-    world.enemyMissiles,
-  ].map((l: Array<GameObject>) => {
-    return l.filter((x: GameObject) => x.isAlive());
-  });
+  [world.playerMissiles, world.enemies, world.enemyMissiles, world.explosions] =
+    [
+      world.playerMissiles,
+      world.enemies,
+      world.enemyMissiles,
+      world.explosions,
+    ].map((l: Array<GameObject>) => {
+      return l.filter((x: GameObject) => x.isAlive());
+    });
 };

@@ -81,6 +81,7 @@ const Won = new State<GameMode, InputType>(
     const { world } = input;
     world.playerMissiles = [];
     world.enemyMissiles = [];
+    world.explosions = [];
     // disable player activity
     world.player.setDx(0);
   }
@@ -100,6 +101,7 @@ const Lost = new State<GameMode, InputType>(
     world.playerMissiles = [];
     world.enemies = [];
     world.enemyMissiles = [];
+    world.explosions = [];
     // disable player activity
     world.player.setDx(0);
   }
