@@ -1,5 +1,5 @@
-import { CanvasDimensions } from "../types";
-import { WorldState, GameMode } from "../world";
+import { CanvasDimensions, GameMode } from "../types";
+import { WorldState } from "../world";
 import { writeText, textDimensions, textWidth } from "./canvas-helpers";
 
 export const displayText = (

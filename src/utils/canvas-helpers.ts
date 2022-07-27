@@ -1,4 +1,4 @@
-import { Point } from "../types";
+import { Point, CanvasDimensions } from "../types";
 
 export const writeText = (
   ctx: CanvasRenderingContext2D,
@@ -40,3 +40,13 @@ export const textHeight = (
   text: string,
   font: string = "20px Arial"
 ) => textDimensions(ctx, text, font).height;
+
+export const getCanvasDimensions = (): CanvasDimensions => {
+  const canvas: HTMLCanvasElement = document.getElementById(
+    "canvas"
+  ) as HTMLCanvasElement;
+  return {
+    canvasWidth: canvas.width,
+    canvasHeight: canvas.height,
+  };
+};

@@ -7,19 +7,9 @@ import {
   detectEnemyMissileAndPlayerShipCollisions,
   clearDeadGameObjectsFromWorld,
   randomlyGenerateEnemyMissiles,
-  gameStateMachineUpdate,
 } from "./world";
-
 import { stateMachine } from "./state-machine/game-state-machine";
-
-// import { StateMachine } from "./state-machine/state-machine";
-// create state machine object in here,
-// probably define specific states for this application in a diff folder
-// or nested folder of state-machine?
-// the state type will be State<GameMode, UserInput> though
-
 import { displayText } from "./utils/display-text";
-
 import { CanvasDimensions } from "./types";
 
 const canvas: HTMLCanvasElement = document.getElementById(
@@ -45,13 +35,7 @@ function animate() {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-  gameStateMachineUpdate(
-    world,
-    { keyDown: Key.NoOp, keyUp: Key.NoOp },
-    canvasDimensions
-  );
-
-  stateMachine.transition({
+  world.gameMode = stateMachine.transitionAndBehavior({
     keyDown: Key.NoOp,
     keyUp: Key.NoOp,
     world,
@@ -78,30 +62,19 @@ function animate() {
 
 // listen for user inputs with keydown and keyup
 document.addEventListener("keydown", (e: KeyboardEvent) => {
-  gameStateMachineUpdate(
+  world.gameMode = stateMachine.transitionAndBehavior({
+    keyDown: parseKey(e),
+    keyUp: Key.NoOp,
     world,
-    { keyDown: parseKey(e), keyUp: Key.NoOp },
-    canvasDimensions
-  );
-
-  stateMachine.transition({ keyDown: parseKey(e), keyUp: Key.NoOp, world });
-  // parseInputAndReturnAction(e, world);
-  // action(world);
+  });
 });
 
 document.addEventListener("keyup", (e: KeyboardEvent) => {
-  gameStateMachineUpdate(
-    world,
-    { keyDown: Key.NoOp, keyUp: parseKey(e) },
-    canvasDimensions
-  );
-
-  stateMachine.transition({
+  world.gameMode = stateMachine.transitionAndBehavior({
     keyDown: Key.NoOp,
     keyUp: parseKey(e),
     world,
   });
-  // parseInputAndStopPlayerMoving(e, world);
 });
 
 animate();
