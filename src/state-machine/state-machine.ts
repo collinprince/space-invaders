@@ -14,9 +14,13 @@ export class StateMachine<StateEnum, InputType> {
     states.forEach((state) => this.stateMap_.set(state.state(), state));
   }
 
-  transition(input: InputType) {
+  transition(input: InputType): void {
+    const nextState = this.stateMap_.get(this.currentState_)?.transition(input);
     this.currentState_ =
-      this.stateMap_.get(this.currentState_)?.transition(input) ||
-      this.currentState_;
+      nextState === undefined ? this.currentState_ : nextState;
+  }
+
+  currentState(): StateEnum {
+    return this.currentState_;
   }
 }

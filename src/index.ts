@@ -10,6 +10,14 @@ import {
   gameStateMachineUpdate,
 } from "./world";
 
+import { stateMachine } from "./state-machine/game-state-machine";
+
+// import { StateMachine } from "./state-machine/state-machine";
+// create state machine object in here,
+// probably define specific states for this application in a diff folder
+// or nested folder of state-machine?
+// the state type will be State<GameMode, UserInput> though
+
 import { displayText } from "./utils/display-text";
 
 import { CanvasDimensions } from "./types";
@@ -43,6 +51,12 @@ function animate() {
     canvasDimensions
   );
 
+  stateMachine.transition({
+    keyDown: Key.NoOp,
+    keyUp: Key.NoOp,
+    world,
+  });
+
   // write information for user to screen (lives remaining, title text, etc.)
   displayText(ctx, world, canvasDimensions);
 
@@ -69,6 +83,8 @@ document.addEventListener("keydown", (e: KeyboardEvent) => {
     { keyDown: parseKey(e), keyUp: Key.NoOp },
     canvasDimensions
   );
+
+  stateMachine.transition({ keyDown: parseKey(e), keyUp: Key.NoOp, world });
   // parseInputAndReturnAction(e, world);
   // action(world);
 });
@@ -79,6 +95,12 @@ document.addEventListener("keyup", (e: KeyboardEvent) => {
     { keyDown: Key.NoOp, keyUp: parseKey(e) },
     canvasDimensions
   );
+
+  stateMachine.transition({
+    keyDown: Key.NoOp,
+    keyUp: parseKey(e),
+    world,
+  });
   // parseInputAndStopPlayerMoving(e, world);
 });
 
