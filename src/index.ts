@@ -8,10 +8,12 @@ import {
   clearDeadGameObjectsFromWorld,
   randomlyGenerateEnemyMissiles,
   randomlyGenerateStars,
+  detectPlayerShipAndEnemyShipCollisions,
 } from "./world";
 import { stateMachine } from "./state-machine/game-state-machine";
 import { displayText } from "./utils/display-text";
-import { CanvasDimensions } from "./types";
+import { CanvasDimensions, GameMode } from "./types";
+import { setNextLevel } from "./levels/levels";
 
 const canvas: HTMLCanvasElement = document.getElementById(
   "canvas"
@@ -43,7 +45,7 @@ function animate() {
   });
 
   // write information for user to screen (lives remaining, title text, etc.)
-  displayText(ctx, world, canvasDimensions);
+  displayText(ctx, world);
 
   // randomly generate attacks against the player
   randomlyGenerateEnemyMissiles(world);
@@ -57,6 +59,8 @@ function animate() {
   detectPlayerMissileAndEnemyShipCollisions(world);
   // detect collisions between enemy missiles and player ship
   detectEnemyMissileAndPlayerShipCollisions(world);
+  // detect collisions between player ship and enemy ships
+  detectPlayerShipAndEnemyShipCollisions(world);
   // clear out dead game objects
   clearDeadGameObjectsFromWorld(world);
   // call next animation frame

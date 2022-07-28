@@ -26,8 +26,22 @@ export class StateMachine<StateEnum, InputType> {
   }
 
   transitionAndBehavior(input: InputType): StateEnum {
-    this.behavior(input);
-    return this.transition(input);
+    let nextState = this.stateMap_.get(this.currentState_)?.transition(input);
+    nextState = nextState === undefined ? this.currentState_ : nextState;
+    // if this is a transition, call exit and entry behavior for respective states
+    if (nextState !== this.currentState_) {
+      const currentStateObj = this.stateMap_.get(this.currentState_);
+      const nextStateObj = this.stateMap_.get(nextState);
+      if (currentStateObj !== undefined && nextStateObj !== undefined) {
+        currentStateObj.exitBehavior(input);
+        nextStateObj.enterBehavior(input);
+      }
+    } else {
+      // else call standard state behavior
+      this.behavior(input);
+    }
+    this.currentState_ = nextState;
+    return this.currentState_;
   }
 
   currentState(): StateEnum {

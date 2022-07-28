@@ -18,4 +18,5 @@ export enum GameMode {
   Play = 1,
   Won = 2,
   Lost = 3,
+  BetweenLevels = 4,
 }

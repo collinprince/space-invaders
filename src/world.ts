@@ -25,6 +25,7 @@ export type WorldState = {
   maxX: number;
   maxY: number;
   gameMode: GameMode;
+  currentLevel: number;
 };
 
 // function to create a world object in a startup state
@@ -43,33 +44,9 @@ export const init = (
     maxX: canvasWidth,
     maxY: canvasHeight,
     gameMode: GameMode.Start,
+    currentLevel: 0,
   };
   return world;
-};
-
-const NUM_ENEMIES: number = 10;
-
-export const reset = (
-  world: WorldState,
-  canvasDimensions: CanvasDimensions
-): void => {
-  let playerStart: Point = {
-    x: canvasDimensions.canvasWidth / 2 - 10,
-    y: canvasDimensions.canvasHeight - 100,
-  };
-  world.player.setPosition(playerStart.x, playerStart.y);
-  world.player.numLives = STARTING_NUM_LIVES;
-  for (let i = 0; i < NUM_ENEMIES; ++i) {
-    let point: Point = {
-      x: 20 + (canvasDimensions.canvasWidth / NUM_ENEMIES) * i,
-      y: canvasDimensions.canvasHeight / 10,
-    };
-    if (i % 2 == 0) {
-      world.enemies.push(createEnemyShip(point));
-    } else {
-      world.enemies.push(createAttackingEnemyShip(point));
-    }
-  }
 };
 
 export const drawAndUpdateWorld = (
@@ -156,6 +133,23 @@ export const detectEnemyMissileAndPlayerShipCollisions = (
         createExplosion({
           x: enemyMissile.x + enemyMissile.width / 2,
           y: enemyMissile.y,
+        })
+      );
+    }
+  });
+};
+
+export const detectPlayerShipAndEnemyShipCollisions = (
+  world: WorldState
+): void => {
+  world.enemies.forEach((enemy) => {
+    if (objectsAreColliding(world.player, enemy)) {
+      world.player.decrementLives();
+      enemy.alive = false;
+      world.explosions.push(
+        createExplosion({
+          x: enemy.x + enemy.width / 2,
+          y: enemy.y + enemy.height,
         })
       );
     }

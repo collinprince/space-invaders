@@ -1,11 +1,12 @@
 import { State } from "./state";
 import { Key } from "../input-handling";
-import { WorldState, reset } from "../world";
+import { WorldState } from "../world";
 import { StateMachine } from "./state-machine";
 import { PLAYER_MOVING_SPEED } from "../game-objects/player-ship";
 import { createPlayerMissile } from "../game-objects/player-missile";
 import { Point, GameMode } from "../types";
 import { getCanvasDimensions } from "../utils/canvas-helpers";
+import { setNextLevel } from "../levels/levels";
 
 export type InputType = {
   keyDown: Key;
@@ -21,10 +22,12 @@ const Start = new State<GameMode, InputType>(
     }
     return GameMode.Start;
   },
-  (input: InputType) => {
-    if (input.world.enemies.length === 0) {
-      reset(input.world, getCanvasDimensions());
-    }
+  (input: InputType) => {},
+  {
+    exitBehavior: (input: InputType) => {
+      input.world.player.numLives = 3;
+      input.world.currentLevel = 0;
+    },
   }
 );
 
@@ -33,11 +36,10 @@ const Play = new State<GameMode, InputType>(
   (input: InputType) => {
     const { world } = input;
     if (world.enemies.length === 0) {
-      return GameMode.Won;
+      return GameMode.BetweenLevels;
     } else if (world.player.numLives === 0) {
       return GameMode.Lost;
     }
-
     return GameMode.Play;
   },
   (input: InputType) => {
@@ -65,6 +67,25 @@ const Play = new State<GameMode, InputType>(
     } else if (input.keyUp === Key.Right && world.player.dx > 0) {
       world.player.setDx(0);
     }
+  },
+  {
+    enterBehavior: (input: InputType) => {
+      const { canvasWidth, canvasHeight } = getCanvasDimensions();
+      let playerStart: Point = {
+        x: canvasWidth / 2 - 10,
+        y: canvasHeight - 100,
+      };
+      input.world.player.setPosition(playerStart.x, playerStart.y);
+      setNextLevel(input.world);
+    },
+    exitBehavior: (input: InputType) => {
+      // end game activity
+      input.world.enemies = [];
+      input.world.enemyMissiles = [];
+      input.world.playerMissiles = [];
+      input.world.explosions = [];
+      input.world.player.setDx(0);
+    },
   }
 );
 
@@ -76,15 +97,7 @@ const Won = new State<GameMode, InputType>(
     }
     return GameMode.Won;
   },
-  (input: InputType) => {
-    // end world's activity
-    const { world } = input;
-    world.playerMissiles = [];
-    world.enemyMissiles = [];
-    world.explosions = [];
-    // disable player activity
-    world.player.setDx(0);
-  }
+  (input: InputType) => {}
 );
 
 const Lost = new State<GameMode, InputType>(
@@ -95,19 +108,26 @@ const Lost = new State<GameMode, InputType>(
     }
     return GameMode.Lost;
   },
+  (input: InputType) => {}
+);
+
+const BetweenLevels = new State<GameMode, InputType>(
+  GameMode.BetweenLevels,
   (input: InputType) => {
-    // end world's activity
-    const { world } = input;
-    world.playerMissiles = [];
-    world.enemies = [];
-    world.enemyMissiles = [];
-    world.explosions = [];
-    // disable player activity
-    world.player.setDx(0);
+    if (input.keyDown === Key.Spacebar) {
+      return GameMode.Play;
+    }
+    return GameMode.BetweenLevels;
+  },
+  (input: InputType) => {},
+  {
+    exitBehavior: (input: InputType) => {
+      ++input.world.currentLevel;
+    },
   }
 );
 
 export const stateMachine = new StateMachine<GameMode, InputType>(
   GameMode.Start,
-  [Start, Play, Won, Lost]
+  [Start, Play, Won, Lost, BetweenLevels]
 );
