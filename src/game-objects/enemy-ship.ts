@@ -8,7 +8,8 @@ const ENEMY_DY: number = 0;
 
 class EnemyShip extends GameObject {
   internalClock: number;
-  constructor(startPoint: Point) {
+  startPoint: Point;
+  constructor(startPoint: Point, updatePosition: (this: EnemyShip) => void) {
     super(
       startPoint.x,
       startPoint.y,
@@ -17,13 +18,18 @@ class EnemyShip extends GameObject {
       ENEMY_DX,
       ENEMY_DY,
       drawEnemyShip,
-      { updatePosition: updatePositionEnemyShip }
+      { updatePosition }
     );
     this.internalClock = 0;
+    this.startPoint = startPoint;
   }
 }
 export const createEnemyShip = (startPoint: Point): EnemyShip => {
-  return new EnemyShip(startPoint);
+  return new EnemyShip(startPoint, updatePositionEnemySideToSideShip);
+};
+
+export const createCirclingEnemyShip = (startPoint: Point): EnemyShip => {
+  return new EnemyShip(startPoint, updatePositionCirclingEnemyShip);
 };
 
 function drawEnemyShip(this: GameObject, ctx: CanvasRenderingContext2D): void {
@@ -40,12 +46,30 @@ function drawEnemyShip(this: GameObject, ctx: CanvasRenderingContext2D): void {
   // ctx.fillRect(this.x, this.y, this.width, this.height);
 }
 
-function updatePositionEnemyShip(this: EnemyShip): void {
+const SIDE_TO_SIDE_LIFETIME = 40;
+
+function updatePositionEnemySideToSideShip(this: EnemyShip): void {
   // on each 8th tick, switch direction of missile
   this.x += this.dx;
   this.internalClock += 1;
-  if (this.internalClock == 40) {
+  if (this.internalClock == SIDE_TO_SIDE_LIFETIME) {
     this.internalClock = 0;
     this.dx = -this.dx;
   }
+}
+
+const CIRCLE_RADIUS = 30;
+const CIRCLE_LIFETIME = 360;
+
+const degreesToRadians = (degrees: number): number => (Math.PI / 180) * degrees;
+
+function updatePositionCirclingEnemyShip(this: EnemyShip): void {
+  console.log("calling this");
+  this.x =
+    this.startPoint.x +
+    Math.cos(degreesToRadians(this.internalClock)) * CIRCLE_RADIUS;
+  this.y =
+    this.startPoint.y +
+    Math.sin(degreesToRadians(this.internalClock)) * CIRCLE_RADIUS;
+  this.internalClock = (this.internalClock + 1) % CIRCLE_LIFETIME;
 }

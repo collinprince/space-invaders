@@ -3,7 +3,10 @@ import { PlayerShip, STARTING_NUM_LIVES } from "./game-objects/player-ship";
 import { objectsAreColliding } from "./utils/boundaries";
 import { Point, CanvasDimensions, GameMode } from "./types";
 import { createPlayerShip } from "./game-objects/player-ship";
-import { createEnemyShip } from "./game-objects/enemy-ship";
+import {
+  createEnemyShip,
+  createCirclingEnemyShip,
+} from "./game-objects/enemy-ship";
 import { createEnemyMissile } from "./game-objects/enemy-missile";
 import { createExplosion } from "./game-objects/explosion";
 import { createStar } from "./game-objects/star";
@@ -60,7 +63,11 @@ export const reset = (
       x: 20 + (canvasDimensions.canvasWidth / NUM_ENEMIES) * i,
       y: canvasDimensions.canvasHeight / 10,
     };
-    world.enemies.push(createEnemyShip(point));
+    if (i % 2 == 0) {
+      world.enemies.push(createEnemyShip(point));
+    } else {
+      world.enemies.push(createCirclingEnemyShip(point));
+    }
   }
 };
 
@@ -113,7 +120,7 @@ export const randomlyGenerateStars = (world: WorldState): void => {
   const { canvasWidth, canvasHeight } = getCanvasDimensions();
   for (let x = 0; x < canvasWidth; ++x) {
     if (Math.random() < CHANCE_STAR) {
-      world.stars.push(createStar({ x, y: canvasHeight }));
+      world.stars.push(createStar({ x, y: 0 }));
     }
   }
 };
