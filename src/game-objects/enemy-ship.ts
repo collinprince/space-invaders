@@ -64,7 +64,6 @@ const CIRCLE_LIFETIME = 360;
 const degreesToRadians = (degrees: number): number => (Math.PI / 180) * degrees;
 
 function updatePositionCirclingEnemyShip(this: EnemyShip): void {
-  console.log("calling this");
   this.x =
     this.startPoint.x +
     Math.cos(degreesToRadians(this.internalClock)) * CIRCLE_RADIUS;
