@@ -1,5 +1,6 @@
 import { GameObject } from "./game-object";
 import { Point } from "../types";
+import { getCanvasDimensions } from "../utils/canvas-helpers";
 
 const ENEMY_WIDTH: number = 20;
 const ENEMY_HEIGHT: number = 20;
@@ -43,7 +44,6 @@ function drawEnemyShip(this: GameObject, ctx: CanvasRenderingContext2D): void {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  // ctx.fillRect(this.x, this.y, this.width, this.height);
 }
 
 const SIDE_TO_SIDE_LIFETIME = 40;
@@ -71,4 +71,28 @@ function updatePositionCirclingEnemyShip(this: EnemyShip): void {
     this.startPoint.y +
     Math.sin(degreesToRadians(this.internalClock)) * CIRCLE_RADIUS;
   this.internalClock = (this.internalClock + 1) % CIRCLE_LIFETIME;
+}
+
+const ATTACK_TIME = 500;
+const ATTACKING_SPEED = 2;
+
+export const createAttackingEnemyShip = (startPoint: Point) => {
+  return new EnemyShip(startPoint, updatePositionToAttackUser);
+};
+
+function updatePositionToAttackUser(this: EnemyShip): void {
+  this.internalClock += 1;
+  if (this.internalClock >= ATTACK_TIME) {
+    this.y += ATTACKING_SPEED;
+    // move ship back to top of screen when we've flown off bottom
+    if (this.y > getCanvasDimensions().canvasHeight) {
+      this.y = 0 - this.height;
+    }
+
+    // when we've returned to start point, reset
+    if (this.y === this.startPoint.y) {
+      // reset when we get back to start
+      this.internalClock = 0;
+    }
+  }
 }

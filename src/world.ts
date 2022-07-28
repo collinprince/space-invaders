@@ -6,6 +6,7 @@ import { createPlayerShip } from "./game-objects/player-ship";
 import {
   createEnemyShip,
   createCirclingEnemyShip,
+  createAttackingEnemyShip,
 } from "./game-objects/enemy-ship";
 import { createEnemyMissile } from "./game-objects/enemy-missile";
 import { createExplosion } from "./game-objects/explosion";
@@ -66,7 +67,7 @@ export const reset = (
     if (i % 2 == 0) {
       world.enemies.push(createEnemyShip(point));
     } else {
-      world.enemies.push(createCirclingEnemyShip(point));
+      world.enemies.push(createAttackingEnemyShip(point));
     }
   }
 };
