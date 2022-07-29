@@ -27,7 +27,7 @@ array.
 ### Want to create your own enemy or game object?
 
 head to game-objects/game-object.ts, check out the structure of the GameObject
-base class, and feel create to create a version of that class by passing in your own movement/alive functions, or for
+base class, and feel free to create a version of that class by passing in your own movement/alive functions, or for
 even more custom behavior derive a new class from GameObject
 
 ### Want to add some new screen/state to the game (help menu, pause menu, etc.)?
