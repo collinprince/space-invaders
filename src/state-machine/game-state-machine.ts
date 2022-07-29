@@ -6,7 +6,7 @@ import { PLAYER_MOVING_SPEED } from "../game-objects/player-ship";
 import { createPlayerMissile } from "../game-objects/player-missile";
 import { Point, GameMode } from "../types";
 import { getCanvasDimensions } from "../utils/canvas-helpers";
-import { setNextLevel } from "../levels/levels";
+import { hasPlayerWon, setNextLevel } from "../levels/levels";
 
 export type InputType = {
   keyDown: Key;
@@ -36,6 +36,9 @@ const Play = new State<GameMode, InputType>(
   (input: InputType) => {
     const { world } = input;
     if (world.enemies.length === 0) {
+      if (hasPlayerWon(world)) {
+        return GameMode.Won;
+      }
       return GameMode.BetweenLevels;
     } else if (world.player.numLives === 0) {
       return GameMode.Lost;
